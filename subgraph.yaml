@@ -1,0 +1,43 @@
+specVersion: 0.0.2
+description: Asynchronous Art is an experimental art movement born out of the question "what does art look like when it can be programmed?" What if art could evolve over time, react to its owners, or pull data from the outside world? It’s time to find out what’s possible when modern art takes full advantage of the digital medium.
+repository: https://github.com/tommymsz006/async-art-subgraph
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: AsyncArtwork
+    network: mainnet
+    source:
+      address: "0x6c424c25e9f1fff9642cb5b7750b0db7312c29ad"
+      abi: AsyncArtwork
+      startBlock: 9555952
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - BidProposed
+        - BidWithdrawn
+        - BuyPriceSet
+        - ControlLeverUpdated
+        - PlatformAddressUpdated
+        - RoyaltyAmountUpdated
+        - TokenSale
+        - Transfer
+      abis:
+        - name: AsyncArtwork
+          file: ./abis/AsyncArtwork.json
+      eventHandlers:
+        - event: BidProposed(uint256,uint256,address)
+          handler: handleBidProposed
+        - event: BidWithdrawn(uint256)
+          handler: handleBidWithdrawn
+        - event: BuyPriceSet(uint256,uint256)
+          handler: handleBuyPriceSet
+        - event: RoyaltyAmountUpdated(uint256,uint256,uint256)
+          handler: handleRoyaltyAmountUpdated
+        - event: TokenSale(uint256,uint256,address)
+          handler: handleTokenSale
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: ./src/mapping.ts

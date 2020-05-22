@@ -1,0 +1,82 @@
+type Market @entity {
+  id: ID!
+  platformPrimaryFee: BigInt!
+  platformSecondaryFee: BigInt!
+  artistRoyaltyFee: BigInt!
+  lastMasterArtwork: Artwork 
+}
+
+type Artwork @entity {
+  id: ID!
+  tokenId: BigInt!
+  artists: [Account!]!
+  owner: Account!
+  uri: String!
+
+  isMaster: Boolean!
+  masterArtwork: Artwork
+  controlArtworks: [Artwork!] @derivedFrom(field: "masterArtwork")
+
+  status: ArtworkStatus!
+  currentBid: Bid
+  currentSale: Sale
+  bids: [Bid!]
+  sales: [Sale!]
+  transfers: [Transfer!]
+
+  firstTransferPrice: BigInt
+  lastTransferPrice: BigInt
+  timeCreated: BigInt!
+  timeLastTransferred: BigInt
+}
+
+enum ArtworkStatus {
+  Created
+  Sold
+}
+
+type Bid @entity {
+  id: ID!
+  bidder: Account!
+  price: BigInt!
+  timeRaised: BigInt!
+  status: BidStatus!
+  timeCancelled: BigInt
+  acceptedBy: Account
+  timeAccepted: BigInt
+  artwork: Artwork! @derivedFrom(field: "bids")
+}
+
+enum BidStatus {
+  Open
+  Accepted
+  Cancelled
+}
+
+type Sale @entity {
+  id: ID!
+  seller: Account!
+  price: BigInt!
+  timeRaised: BigInt!
+  isSold: Boolean!
+  buyer: Account
+  timeSold: BigInt
+  artwork: Artwork! @derivedFrom(field: "sales")
+}
+
+type Account @entity {
+  id: ID!
+  address: Bytes!
+  totalPrimaryIncome: BigInt!
+  totalRoyalty: BigInt!
+
+  createdArtworks: [Artwork!] @derivedFrom(field: "artists")
+  ownedArtworks: [Artwork!] @derivedFrom(field: "owner")
+}
+
+type Transfer @entity {
+  id: ID!
+  from: Account!
+  to: Account!
+  timestamp: BigInt!
+}
